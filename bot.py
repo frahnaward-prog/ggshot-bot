@@ -52,43 +52,56 @@ async def post_signal(update: Update, context: ContextTypes.DEFAULT_TYPE):
     args = context.args
     if len(args) < 6:
         await update.message.reply_text(
-            "Usage:\n/postsignal PAIR DIRECTION ENTRY TARGETS SL ACCURACY\n\n"
-            "Example:\n/postsignal VIRTUALUSDT Long 0.5691-0.5972 0.6050,0.6127,0.6205,0.6438 0.5617 93"
+            "Usage:\n"
+            "/postsignal PAIR DIRECTION ENTRY TP1,TP2,TP3 SL ACCURACY [TERM] [LEVERAGE] [MARKET]\n\n"
+            "Example:\n"
+            "/postsignal VIRTUALUSDT Long 0.5691-0.5972 0.6050,0.6127,0.6205 0.5617 93 Long-term 10x Perpetual"
         )
         return
 
+    from datetime import datetime, timedelta
+    import pytz
+
     pair = args[0].upper()
-    direction = args[1]
+    direction = args[1].capitalize()
     entry = args[2]
     targets = args[3]
     sl = args[4]
     accuracy = args[5]
 
-    targets_list = targets.split(",")
-    targets_text = "\n".join([f"🎯 Target {i+1}: <b>{t.strip()}</b>" for i, t in enumerate(targets_list)])
+    # Optional parameters
+    term = args[6] if len(args) > 6 else "Long-term"
+    leverage = args[7] if len(args) > 7 else "10x"
+    market = args[8] if len(args) > 8 else "Perpetual"
 
-    text = f"""<b>GG-Shot LEAK</b> 📩 <b>Predictum LEAK</b>
+    now = datetime.now(pytz.UTC)
+    valid_until = now + timedelta(hours=12)
 
-<b>Extreme Accurate futures Call</b>
-10X Low-Risk Leverage 🧲
+    # Only show maximum 3 Take Profits
+    targets_list = targets.split(",")[:3]
+    targets_text = "\n".join([f"TP{i+1}: <b>{t.strip()}</b>" for i, t in enumerate(targets_list)])
 
-<b>timeframe for Accurate Position</b> 📱
-5m | Scalp
-15m | Short-Term
-30m | Mid-Term
-1h | Mid-Term
-4h | Long-Term
+    direction_emoji = "🟢 LONG" if direction.lower() == "long" else "🔴 SHORT"
 
+    text = f"""🚀 <b>GG-Shot Signal</b>
+
+<b>Pair:</b> #{pair}
+<b>Direction:</b> {direction_emoji}
+<b>Market:</b> {market}
+<b>Term:</b> {term}
+<b>Leverage:</b> {leverage}
+
+📍 <b>Entry Zone:</b> {entry}
+
+🎯 <b>Take Profits:</b>
 {targets_text}
 
 🛑 <b>Stop-Loss:</b> {sl}
-📊 <b>Strategy Accuracy:</b> {accuracy}%
 
-<b>Back-Test for Accurate Position</b> 📚
-Last 5 → 92% | Last 10 → 93% | Last 20 → 94%
+📊 <b>Accuracy:</b> {accuracy}%
 
-Bot is Live !!! 🌱
-Grab Your Membership Here 📦 (instant delivery)"""
+⏰ <b>Posted:</b> {now.strftime('%H:%M')} UTC
+⏳ <b>Valid Until:</b> {valid_until.strftime('%H:%M')} UTC"""
 
     miniapp_link = (
         f"{MINIAPP_URL}/miniapp"
@@ -102,8 +115,7 @@ Grab Your Membership Here 📦 (instant delivery)"""
     ]]
 
     await update.message.reply_text(text, parse_mode="HTML", reply_markup=InlineKeyboardMarkup(keyboard))
-    await update.message.reply_text("✅ Signal posted successfully! (premium style)")
-
+    await update.message.reply_text("✅ Signal posted successfully!")
 
 # ==================== STATS COMMAND ====================
 async def stats(update: Update, context: ContextTypes.DEFAULT_TYPE):
