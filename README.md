@@ -1,0 +1,1 @@
+# ggshot-bot
