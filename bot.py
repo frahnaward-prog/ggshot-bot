@@ -76,24 +76,7 @@ def main():
     app.add_handler(CommandHandler("start", start))
     app.add_handler(CommandHandler("postsignal", post_signal))
 
-    # Check if running on Railway
-    if os.getenv("RAILWAY_ENVIRONMENT"):
-        # Production mode (Webhook)
-        port = int(os.getenv("PORT", 8080))
-        domain = os.getenv("RAILWAY_PUBLIC_DOMAIN")
-        webhook_url = f"https://{domain}/webhook"
-
-        print(f"✅ Starting in Production mode with webhook: {webhook_url}")
-        app.run_webhook(
-            listen="0.0.0.0",
-            port=port,
-            url_path="webhook",
-            webhook_url=webhook_url
-        )
-    else:
-        # Local mode
-        print("✅ GG-Shot Bot is running in Local mode...")
-        app.run_polling()
-
+    print("✅ GG-Shot Bot is running...")
+    app.run_polling()
 if __name__ == "__main__":
     main()
