@@ -69,7 +69,6 @@ async def post_signal(update: Update, context: ContextTypes.DEFAULT_TYPE):
     sl = args[4]
     accuracy = args[5]
 
-    # Optional parameters
     term = args[6] if len(args) > 6 else "Long-term"
     leverage = args[7] if len(args) > 7 else "10x"
     market = args[8] if len(args) > 8 else "Perpetual"
@@ -77,31 +76,35 @@ async def post_signal(update: Update, context: ContextTypes.DEFAULT_TYPE):
     now = datetime.now(pytz.UTC)
     valid_until = now + timedelta(hours=12)
 
-    # Only show maximum 3 Take Profits
     targets_list = targets.split(",")[:3]
-    targets_text = "\n".join([f"TP{i+1}: <b>{t.strip()}</b>" for i, t in enumerate(targets_list)])
+    targets_text = "\n".join([f"TP{i+1} → <b>{t.strip()}</b>" for i, t in enumerate(targets_list)])
 
-    direction_emoji = "🟢 LONG" if direction.lower() == "long" else "🔴 SHORT"
+    direction_text = "🟢 LONG" if direction.lower() == "long" else "🔴 SHORT"
 
     text = f"""🚀 <b>GG-Shot Signal</b>
 
-<b>Pair:</b> #{pair}
-<b>Direction:</b> {direction_emoji}
-<b>Market:</b> {market}
-<b>Term:</b> {term}
-<b>Leverage:</b> {leverage}
+━━━━━━━━━━━━━━━━━━━━
+📌 <b>{pair}</b>
+━━━━━━━━━━━━━━━━━━━━
 
-📍 <b>Entry Zone:</b> {entry}
+Direction : {direction_text}
+Market    : {market}
+Term      : {term}
+Leverage  : {leverage}
 
-🎯 <b>Take Profits:</b>
+📍 <b>Entry Zone</b>
+{entry}
+
+🎯 <b>Take Profits</b>
 {targets_text}
 
-🛑 <b>Stop-Loss:</b> {sl}
+🛑 <b>Stop-Loss</b>
+{sl}
 
 📊 <b>Accuracy:</b> {accuracy}%
 
-⏰ <b>Posted:</b> {now.strftime('%H:%M')} UTC
-⏳ <b>Valid Until:</b> {valid_until.strftime('%H:%M')} UTC"""
+⏰ Posted: {now.strftime('%H:%M')} UTC
+⏳ Valid Until: {valid_until.strftime('%H:%M')} UTC"""
 
     miniapp_link = (
         f"{MINIAPP_URL}/miniapp"
@@ -115,8 +118,7 @@ async def post_signal(update: Update, context: ContextTypes.DEFAULT_TYPE):
     ]]
 
     await update.message.reply_text(text, parse_mode="HTML", reply_markup=InlineKeyboardMarkup(keyboard))
-    await update.message.reply_text("✅ Signal posted successfully!")
-
+    await update.message.reply_text("✅ Professional signal posted!")
 # ==================== STATS COMMAND ====================
 async def stats(update: Update, context: ContextTypes.DEFAULT_TYPE):
     text = """📊 <b>GG-Shot | Predictum Back-Test Stats</b>
